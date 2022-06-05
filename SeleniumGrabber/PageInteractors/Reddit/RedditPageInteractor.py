@@ -8,18 +8,19 @@ from Abstract import IPageInteractor
 
 class RedditPageInteractor(IPageInteractor.IPageInteractor):
 
-    def __init__(self, driver, zoom=0):
-        super().__init__(driver, zoom)
+    def __init__(self, driver, font_size=20):
+        super().__init__(driver, font_size)
 
         self.settings = RedditSettingsInteractor.RedditSettingsInteractor(self.driver)
 
     def get_posts(self) -> List[object]:
-        self.zoom()
-        return self.driver.find_elements(By.XPATH, "//div[contains(@class,'RichTextJSON-root')]")
+        return self.driver.find_elements(By.XPATH,
+                                         "//div[@data-testid='post-container']/div/div/div/div/span[contains(text(),'Posted by')]/../../../../..")
 
     def open_post(self, post) -> RedditPostInteractor.RedditPostInteractor:
         post.click()
-        return RedditPostInteractor.RedditPostInteractor(self.driver, self.action, self.wait)
+        return RedditPostInteractor.RedditPostInteractor(self.driver, self.action, self.wait,
+                                                         font_size=self.font_size)
 
 # def extract_post_data(self, post) -> Tuple[tempfile.TemporaryDirectory, list]:
 #     self.settings.click_user_dropdown()

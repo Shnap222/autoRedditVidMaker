@@ -6,15 +6,13 @@ from selenium.webdriver.common.keys import Keys
 from abc import ABC, abstractmethod
 
 
-
-
 class IPageInteractor(ABC):
 
-    def __init__(self, driver, zoom: int = 0):
+    def __init__(self, driver, font_size: int = 20):
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 10)
         self.action = ActionChains(self.driver)
-        self.zoom_amount = 100 + zoom
+        self.font_size = font_size
 
     @abstractmethod
     def get_posts(self) -> List[object]:
@@ -23,6 +21,3 @@ class IPageInteractor(ABC):
     @abstractmethod
     def open_post(self, post) -> object:
         pass
-
-    def zoom(self):
-        self.driver.execute_script(f"document.body.style.zoom='zoom {str(self.zoom_amount)}'")

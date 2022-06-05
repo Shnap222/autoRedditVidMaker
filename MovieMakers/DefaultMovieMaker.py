@@ -29,8 +29,6 @@ class DefaultMovieMaker:
 
         return output_path
 
-        # self.create_video_using_multiple_cuts(half_made_path, output_path)
-
     def add_static_image_to_audio(self, image_path: str, audio_path: str, output_path: str):
         """Create and save a video file to `output_path` after
         combining a static image that is located in `image_path`
@@ -48,18 +46,6 @@ class DefaultMovieMaker:
         # write the resuling video clip
         video_clip.write_videofile(output_path)
 
-    def create_video_using_multiple_cuts(self, cut_directory: str, output_path: str):
-        clips = [VideoFileClip(os.path.join(cut_directory, file_path), ) for file_path in
-                 sorted(os.listdir(cut_directory), key=lambda file: int(file.split('.')[0]))]
-
-        print("finished processing")
-
-        final = concatenate_videoclips(clips, method='compose')
-
-        print("finished combining them")
-
-        final.write_videofile(output_path)
-
     def create_video_with_background_video(self, bg_video_path: str, centered_videos_path: str,
                                            output_path: str, bg_audio_path: str = ""):
         centered_videos_files = sorted(os.listdir(centered_videos_path),
@@ -76,12 +62,13 @@ class DefaultMovieMaker:
 
         print("finished setting up videos")
 
-        # audio = AudioFileClip(bg_audio_path).subclip(0, inner_video.duration + 1)
-        bg_video = VideoFileClip(bg_video_path, audio=False).subclip(10, calc_duration + 11)
+        bg_video = VideoFileClip(bg_video_path, audio=False if not bg_audio_path else True).subclip(10, calc_duration + 11)
 
-        # bg_video = bg_video.set_audio(audio)
+        if bg_audio_path:
+            audio = AudioFileClip(bg_audio_path).subclip(0, calc_duration + 1)
+            bg_video = bg_video.set_audio(audio)
 
-        # bg_video = bg_video.volumex(0.05)
+            bg_video = bg_video.volumex(0.05)
 
         bg_video_resized = bg_video.resize(height=1920)
         bg_video_resized = bg_video_resized.crop(x1=1166.6, y1=0, x2=2246.6, y2=1920)
@@ -90,3 +77,4 @@ class DefaultMovieMaker:
 
         final = CompositeVideoClip(videos_list)
         final.write_videofile(output_path)
+        return output_path
